@@ -24,15 +24,23 @@ makes follow up really simple.
 
 == Installing and Configuring
 
-- copy the post_receive script and the git_commit_notifier directory
-  into the /project/.git/hooks directory of your Git server
-- make sure the following Git settings are correct:
-      git config hooks.mailinglist (email address of the recipient, probably your mailing list address)
-      git config hooks.emailprefix (application name, used in email subject)
-    (see config/config.yml for overridding these Git settings)
+Make sure the following Git settings are correct:
+- git config hooks.mailinglist (email address of the recipient, probably your mailing list address)
+- git config hooks.emailprefix (application name, used in email subject)
+- see config.yml for overriding these settings
+
+Run the automated installation script:
+  sudo rake install
+
+or perform manual install:
+
+- copy the git_commit_notifier directory into your /usr/local/share directory
+- copy the post-receive script into the /.git/hooks directory of the project on your Git server
 - set your preferred delivery method in config.yml, set SMTP server options if you choose this delivery method
 - make sure your 'post_receive' script is executable
 
+
+See /usr/local/share/git_commit_notifier/config/config.yml for setting your SMTP server address.
 
 == License
 MIT License, see the file LICENSE.
