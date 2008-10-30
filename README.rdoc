@@ -9,7 +9,7 @@ the commit as well as the author, project and branch name.
 
 For example:
 
-[rails][master] Pratik Naik  - Fix Brasilia timezone. [#1180 state:resolved]
+ [rails][master] Fix Brasilia timezone. [#1180 state:resolved]
 
 A reply-to header is added containing the author of the commit. This
 makes follow up really simple.
