@@ -1,4 +1,4 @@
-#!/usr/local/bin/ruby
+#!/usr/bin/env ruby
 # parameters: revision1, revision 2, branch
 
 require File.dirname(__FILE__) + '/git_commit_notifier/lib/commit_hook'
