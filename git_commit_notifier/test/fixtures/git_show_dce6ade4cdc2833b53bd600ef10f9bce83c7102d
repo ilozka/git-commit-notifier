@@ -1,0 +1,83 @@
+Commit dce6ade4cdc2833b53bd600ef10f9bce83c7102d
+Author: Andrew Kaspick <andrew@redlinesoftware.com>
+Date:   Tue Sep 30 14:15:36 2008 -0500
+
+    Ensure select_tag#name attribute uses [] when :multiple is true. [#1146 state:resolved]
+
+    Signed-off-by: Pratik Naik <pratiknaik@gmail.com>
+
+diff --git a/actionpack/lib/action_view/helpers/form_tag_helper.rb b/actionpack/lib/action_view/helpers/form_tag_helper.rb
+index 208bf91..7492348 100644
+--- a/actionpack/lib/action_view/helpers/form_tag_helper.rb
++++ b/actionpack/lib/action_view/helpers/form_tag_helper.rb
+@@ -62,7 +62,7 @@ module ActionView
+       #   #    <option>3</option><option>4</option></select>
+       #
+       #   select_tag "colors", "<option>Red</option><option>Green</option><option>Blue</option>", :multiple => true
+-      #   # => <select id="colors" multiple="multiple" name="colors"><option>Red</option>
++      #   # => <select id="colors" multiple="multiple" name="colors[]"><option>Red</option>
+       #   #    <option>Green</option><option>Blue</option></select>
+       #
+       #   select_tag "locations", "<option>Home</option><option selected="selected">Work</option><option>Out</option>"
+@@ -70,14 +70,15 @@ module ActionView
+       #   #    <option>Out</option></select>
+       #
+       #   select_tag "access", "<option>Read</option><option>Write</option>", :multiple => true, :class => 'form_input'
+-      #   # => <select class="form_input" id="access" multiple="multiple" name="access"><option>Read</option>
++      #   # => <select class="form_input" id="access" multiple="multiple" name="access[]"><option>Read</option>
+       #   #    <option>Write</option></select>
+       #
+       #   select_tag "destination", "<option>NYC</option><option>Paris</option><option>Rome</option>", :disabled => true
+       #   # => <select disabled="disabled" id="destination" name="destination"><option>NYC</option>
+       #   #    <option>Paris</option><option>Rome</option></select>
+       def select_tag(name, option_tags = nil, options = {})
+-        content_tag :select, option_tags, { "name" => name, "id" => name }.update(options.stringify_keys)
++        html_name = (options[:multiple] == true && !name.to_s.ends_with?("[]")) ? "#{name}[]" : name
++        content_tag :select, option_tags, { "name" => html_name, "id" => name }.update(options.stringify_keys)
+       end
+
+       # Creates a standard text field; use these text fields to input smaller chunks of text like a username
+diff --git a/railties/doc/guides/source/images/icons/callouts/11.png b/railties/doc/guides/source/images/icons/callouts/11.png
+new file mode 100644
+index 0000000..ce47dac
+Binary files /dev/null and b/railties/doc/guides/source/images/icons/callouts/11.png differ
+diff --git a/railties/doc/guides/source/icons/up.png b/railties/doc/guides/source/icons/up.png
+deleted file mode 100644
+index 2db1ce6..0000000
+Binary files a/railties/doc/guides/source/icons/up.png and /dev/null differ
+diff --git a/railties/doc/guides/source/icons/README b/railties/doc/guides/source/icons/README
+deleted file mode 100644
+index f12b2a7..0000000
+--- a/railties/doc/guides/source/icons/README
++++ /dev/null
+@@ -1,5 +0,0 @@
+-Replaced the plain DocBook XSL admonition icons with Jimmac's DocBook
+-icons (http://jimmac.musichall.cz/ikony.php3). I dropped transparency
+-from the Jimmac icons to get round MS IE and FOP PNG incompatibilies.
+-
+-Stuart Rackham
+diff --git a/railties/doc/guides/source/images/icons/README b/railties/doc/guides/source/images/icons/README
+new file mode 100644
+index 0000000..f12b2a7
+--- /dev/null
++++ b/railties/doc/guides/source/images/icons/README
+@@ -0,0 +1,5 @@
++Replaced the plain DocBook XSL admonition icons with Jimmac's DocBook
++icons (http://jimmac.musichall.cz/ikony.php3). I dropped transparency
++from the Jimmac icons to get round MS IE and FOP PNG incompatibilies.
++
++Stuart Rackham
+diff --git a/actionpack/test/template/form_tag_helper_test.rb b/actionpack/test/template/form_tag_helper_test.rb
+index ad8baef..1849a61 100644
+--- a/actionpack/test/template/form_tag_helper_test.rb
++++ b/actionpack/test/template/form_tag_helper_test.rb
+@@ -211,7 +211,8 @@ class FormTagHelperTest < ActionView::TestCase
+   def test_boolean_optios
+     assert_dom_equal %(<input checked="checked" disabled="disabled" id="admin" name="admin" readonly="readonly" type="checkbox" value="1" />), check_box_tag("admin", 1, true, 'disabled' => true, :readonly => "yes")
+     assert_dom_equal %(<input checked="checked" id="admin" name="admin" type="checkbox" value="1" />), check_box_tag("admin", 1, true, :disabled => false, :readonly => nil)
+-    assert_dom_equal %(<select id="people" multiple="multiple" name="people"><option>david</option></select>), select_tag("people", "<option>david</option>", :multiple => true)
++    assert_dom_equal %(<select id="people" multiple="multiple" name="people[]"><option>david</option></select>), select_tag("people", "<option>david</option>", :multiple => true)
++    assert_dom_equal %(<select id="people[]" multiple="multiple" name="people[]"><option>david</option></select>), select_tag("people[]", "<option>david</option>", :multiple => true)
+     assert_dom_equal %(<select id="people" name="people"><option>david</option></select>), select_tag("people", "<option>david</option>", :multiple => nil)
+   end
+

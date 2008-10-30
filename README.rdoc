@@ -1,0 +1,38 @@
+== Git Commit Notifier
+
+  by Csoma Zoltan (Primalgrasp) (zoltan 'at' primalgrasp 'dot' com)
+
+Sends email commit messages splitting commits that were pushed in one
+step. Email is delivered as text or HTML with changes refined per
+word. Emails have a scanable subject containing the first sentence of
+the commit as well as the author, project and branch name.
+
+For example:
+
+[rails][master] Pratik Naik  - Fix Brasilia timezone. [#1180 state:resolved]
+
+A reply-to header is added containing the author of the commit. This
+makes follow up really simple.
+
+== Requirements
+
+  - Ruby
+  - RubyGems
+  - diff/lcs gem
+  - SMTP server or sendmail compatible mailer
+  - mocha, hpricot gems for testing
+
+== Installing and Configuring
+
+  - copy the post_receive script and the git_commit_notifier directory
+    into the /project/.git/hooks directory of your Git server
+  - make sure the following Git settings are correct:
+        git config hooks.mailinglist (email address of the recipient, probably your mailing list address)
+        git config hooks.emailprefix (application name, used in email subject)
+    (see config/config.yml for overridding these Git settings)
+  - set your preferred delivery method in config.yml, set SMTP server options if you choose this delivery method
+  - make sure your 'post_receive' script is executable
+
+
+== License
+  MIT License, see the file LICENSE.

@@ -1,0 +1,18 @@
+email:
+  application_name:
+  recipient_address:
+  delivery_method: smtp # smtp or sendmail
+
+smtp_server:
+  address: localhost
+  port: 25
+  domain: localhost
+  user_name:
+  password:
+  authentication:
+
+sendmail_options:
+ location: /usr/sbin/sendmail
+ arguments:
+
+

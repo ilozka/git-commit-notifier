@@ -1,0 +1,65 @@
+commit e28ad77bba0574241e6eb64dfd0c1291b221effe
+Author: Tom Stuart <tom@experthuman.com>
+Date:   Wed Oct 8 09:31:00 2008 +0100
+
+    Allow use of :path_prefix and :name_prefix outside of namespaced routes. [#1188 state:resolved]
+    
+    Signed-off-by: Pratik Naik <pratiknaik@gmail.com>
+
+diff --git a/actionpack/lib/action_controller/routing/builder.rb b/actionpack/lib/action_controller/routing/builder.rb
+index 5704d9d..7b888fa 100644
+--- a/actionpack/lib/action_controller/routing/builder.rb
++++ b/actionpack/lib/action_controller/routing/builder.rb
+@@ -60,12 +60,10 @@ module ActionController
+       # segments are passed alongside in order to distinguish between default values
+       # and requirements.
+       def divide_route_options(segments, options)
+-        options = options.dup
++        options = options.except(:path_prefix, :name_prefix)
+ 
+         if options[:namespace]
+           options[:controller] = "#{options.delete(:namespace).sub(/\/$/, '')}/#{options[:controller]}"
+-          options.delete(:path_prefix)
+-          options.delete(:name_prefix)
+         end
+ 
+         requirements = (options.delete(:requirements) || {}).dup
+diff --git a/actionpack/test/controller/routing_test.rb b/actionpack/test/controller/routing_test.rb
+index 1eb26a7..9699a04 100644
+--- a/actionpack/test/controller/routing_test.rb
++++ b/actionpack/test/controller/routing_test.rb
+@@ -924,6 +924,20 @@ uses_mocha 'LegacyRouteSet, Route, RouteSet and RouteLoading' do
+ 
+     end
+ 
++    def test_named_route_with_name_prefix
++      rs.add_named_route :page, 'page', :controller => 'content', :action => 'show_page', :name_prefix => 'my_'
++      x = setup_for_named_route
++      assert_equal("http://named.route.test/page",
++                   x.send(:my_page_url))
++    end
++
++    def test_named_route_with_path_prefix
++      rs.add_named_route :page, 'page', :controller => 'content', :action => 'show_page', :path_prefix => 'my'
++      x = setup_for_named_route
++      assert_equal("http://named.route.test/my/page",
++                   x.send(:page_url))
++    end
++
+     def test_named_route_with_nested_controller
+       rs.add_named_route :users, 'admin/user', :controller => 'admin/user', :action => 'index'
+       x = setup_for_named_route
+@@ -2147,6 +2161,13 @@ uses_mocha 'LegacyRouteSet, Route, RouteSet and RouteLoading' do
+       assert_equal [:x], set.extra_keys(args)
+     end
+ 
++    def test_generate_with_path_prefix
++      set.draw { |map| map.connect ':controller/:action/:id', :path_prefix => 'my' }
++
++      args = { :controller => "foo", :action => "bar", :id => "7", :x => "y" }
++      assert_equal "/my/foo/bar/7?x=y", set.generate(args)
++    end
++
+     def test_named_routes_are_never_relative_to_modules
+       set.draw do |map|
+         map.connect "/connection/manage/:action", :controller => 'connection/manage'

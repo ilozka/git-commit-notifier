@@ -1,0 +1,49 @@
+commit a4629e707d80a5769f7a71ca6ed9471015e14dc9
+Author: Michael Koziarski <michael@koziarski.com>
+Date:   Mon Sep 29 17:36:09 2008 +0200
+
+    Extract transliteration code to a seperate method.
+    
+    Use iconv by default, but only when the transliteration is well behaved.  When it isn't, fallback to mb_chars
+
+diff --git a/activesupport/lib/active_support/inflector.rb b/activesupport/lib/active_support/inflector.rb
+index 89a93f4..f1e7abf 100644
+--- a/activesupport/lib/active_support/inflector.rb
++++ b/activesupport/lib/active_support/inflector.rb
+@@ -1,4 +1,5 @@
+ require 'singleton'
++require 'iconv'
+ 
+ module ActiveSupport
+   # The Inflector transforms words from singular to plural, class names to table names, modularized class names to ones without,
+@@ -258,14 +259,28 @@ module ActiveSupport
+     #   # => <a href="/person/1-donald-e-knuth">Donald E. Knuth</a>
+     def parameterize(string, sep = '-')
+       re_sep = Regexp.escape(sep)
+-      string.mb_chars.normalize(:kd).       # Decompose accented characters
+-        gsub(/[^\x00-\x7F]+/, '').          # Remove anything non-ASCII entirely (e.g. diacritics).
++      transliterate(string).
+         gsub(/[^a-z0-9\-_\+]+/i, sep).      # Turn unwanted chars into the separator.
+         squeeze(sep).                       # No more than one of the separator in a row.
+         gsub(/^#{re_sep}|#{re_sep}$/i, ''). # Remove leading/trailing separator.
+         downcase
+     end
+ 
++
++    # Replaces accented characters with their ascii equivalents.
++    def transliterate(string)
++      Iconv.iconv('ascii//translit//IGNORE', 'utf-8', string).to_s
++    end
++
++    # The iconv transliteration code doesn't function correctly
++    # on some platforms, but it's very fast where it does function.
++    if "foo" != Inflector.transliterate("föö")
++      def transliterate(string)
++        string.mb_chars.normalize(:kd). # Decompose accented characters
++          gsub(/[^\x00-\x7F]+/, '')     # Remove anything non-ASCII entirely (e.g. diacritics).
++      end
++    end
++
+     # Create the name of a table like Rails does for models to table names. This method
+     # uses the +pluralize+ method on the last word in the string.
+     #
