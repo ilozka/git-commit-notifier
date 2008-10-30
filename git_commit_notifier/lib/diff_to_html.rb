@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'diff/lcs'
 require File.dirname(__FILE__) + '/result_processor'
 

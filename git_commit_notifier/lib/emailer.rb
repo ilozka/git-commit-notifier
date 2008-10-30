@@ -2,13 +2,16 @@ require 'yaml'
 
 class Emailer
 
-  def initialize(recipient, from_address, from_alias, subject, text_message, html_message)
+  def initialize(recipient, from_address, from_alias, subject, text_message, html_message, old_rev, new_rev, ref_name)
     @recipient = recipient
     @from_address = from_address
     @from_alias = from_alias
     @subject = subject
     @text_message = text_message
     @html_message = format_html(html_message)
+    @ref_name = ref_name
+    @old_rev = old_rev
+    @new_rev = new_rev
   end
 
   def boundary
@@ -73,6 +76,9 @@ EOF
         "Reply-To: #{from}",
         "To: #{@recipient}",
         "Subject: #{@subject}",
+        "X-Git-Refname: #{@ref_name}",
+        "X-Git-Oldrev: #{@old_rev}",
+        "X-Git-Newrev: #{@new_rev}",
         "Mime-Version: 1.0",
         "Content-Type: multipart/alternative; boundary=#{boundary}\n\n\n",
         "--#{boundary}",
