@@ -1,7 +1,7 @@
 email:
   application_name:
   recipient_address:
-  delivery_method: smtp # smtp or sendmail
+  delivery_method: sendmail # smtp or sendmail
 
 smtp_server:
   address: localhost
