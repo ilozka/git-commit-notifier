@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'cgi'
 require 'net/smtp'
 require 'sha1'

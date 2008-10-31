@@ -14,7 +14,7 @@ task :test do |test|
 end
 
 task :install do |install|
-  puts "Full path to yor project directory (eg. /home/app/myproject):"
+  puts "Full path to yor project repository (eg. /home/git/repositories/myproject.git):"
   project_path = STDIN.gets.strip
 
   hooks_dir = "#{project_path}/hooks"

@@ -2,5 +2,11 @@
 # parameters: revision1, revision 2, branch
 
 require '/usr/local/share/git_commit_notifier/lib/commit_hook'
-CommitHook.run ARGV[0], ARGV[1], ARGV[2]
+
+if ARGV[0].nil?
+  param = STDIN.gets.strip.split
+  CommitHook.run param[0], param[1], param[2]
+else
+  CommitHook.run ARGV[0], ARGV[1], ARGV[2]
+end
 
