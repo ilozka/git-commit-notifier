@@ -1,5 +1,7 @@
 require 'rake'
 require 'rake/testtask'
+require 'rubygems'
+require 'diff/lcs'
 
 task :default => [:test]
 
@@ -12,22 +14,22 @@ task :test do |test|
 end
 
 task :install do |install|
-  require 'rubygems'
-  require 'diff/lcs'
-
   puts "Full path to yor project directory (eg. /home/app/myproject):"
   project_path = STDIN.gets.strip
-  git_root = project_path + '/.git'
-  raise '.git directory not found for the specified project - cannot continue' unless File.exist?(git_root)
+
+  hooks_dir = "#{project_path}/hooks"
+  hooks_dir = "#{project_path}/.git/hooks" unless File.exist?(hooks_dir)
+  raise 'hooks directory not found for the specified project - cannot continue' unless File.exist?(hooks_dir)
+  hooks_dir += '/' unless hooks_dir[-1,-1] == '/'
 
   install_path = '/usr/local/share'
 
   execute_cmd "cp -r git_commit_notifier/ #{install_path}"
   execute_cmd "cp README.rdoc #{install_path}/git_commit_notifier"
   execute_cmd "cp LICENSE #{install_path}/git_commit_notifier"
-  execute_cmd "mv #{git_root}/hooks/post-receive #{git_root}/hooks/post-receive.old.#{Time.now.to_i}" if File.exist?("#{git_root}/hooks/post-receive")
-  execute_cmd "cp post-receive #{git_root}/hooks"
-  execute_cmd "chmod a+x #{git_root}/hooks/post-receive"
+  execute_cmd "mv #{hooks_dir}post-receive #{hooks_dir}post-receive.old.#{Time.now.to_i}" if File.exist?("#{hooks_dir}post-receive")
+  execute_cmd "cp post-receive #{hooks_dir}"
+  execute_cmd "chmod a+x #{hooks_dir}post-receive"
 
   Dir.chdir(project_path)
   config_file = "#{install_path}/git_commit_notifier/config/config.yml"
