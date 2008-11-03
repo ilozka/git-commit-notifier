@@ -2,8 +2,9 @@ require 'yaml'
 
 class Emailer
 
-  def initialize(config, recipient, from_address, from_alias, subject, text_message, html_message, old_rev, new_rev, ref_name)
+  def initialize(config, project_path, recipient, from_address, from_alias, subject, text_message, html_message, old_rev, new_rev, ref_name)
     @config = config
+    @project_path = project_path
     @recipient = recipient
     @from_address = from_address
     @from_alias = from_alias
@@ -46,7 +47,7 @@ EOF
   def perform_delivery_smtp(content,smtp_settings)
     settings = { }
     %w(address port domain user_name password authentication).each do |key|
-      val = smtp_settings[key].value.empty? ? nil : smtp_settings[key].value
+      val = smtp_settings[key].to_s.empty? ? nil : smtp_settings[key]
       settings.merge!({ key => val})
     end
     Net::SMTP.start(settings['address'], settings['port'], settings['domain'],
@@ -60,9 +61,9 @@ EOF
   end
 
   def perform_delivery_sendmail(content, sendmail_settings)
-    args = '-i -t'
-    args += sendmail_settings['arguments'].value
-    IO.popen("#{sendmail_settings['location'].value} #{args}","w+") do |f|
+    args = '-i -t '
+    args += sendmail_settings['arguments'].to_s
+    IO.popen("#{sendmail_settings['location']} #{args}","w+") do |f|
       content.each do |line|
         f.puts line
       end
@@ -92,7 +93,7 @@ EOF
         "Content-Disposition: inline\n\n\n",
         @html_message,
         "--#{boundary}--"]
-    if @config['email']['delivery_method'].value == 'smtp'
+    if @config['email']['delivery_method'] == 'smtp'
       perform_delivery_smtp(content, @config['smtp_server'])
     else
       perform_delivery_sendmail(content, @config['sendmail_options'])

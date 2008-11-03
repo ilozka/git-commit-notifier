@@ -8,11 +8,18 @@ require File.dirname(__FILE__) + '/git'
 
 class CommitHook
 
-  def self.run(config, rev1, rev2, ref_name)
+  def self.run(rev1, rev2, ref_name)
 
-    recipient = config['email']['recipient_address'].value.empty? ? Git.mailing_list_address : config['email']['recipient_address'].value
+    config = YAML.load_file('/usr/local/share/git_commit_notifier/config/config.yml')
+    project_path = Dir.getwd
 
-    repo = config['email']['application_name'].value.empty? ? Git.prefix : config['email']['application_name'].value
+    project_config = config['projects'][project_path]
+
+    recipient = project_config['recipient_address']
+    recipient = Git.mailing_list_address if recipient.empty?
+
+    repo = project_config['application_name']
+    repo = Git.prefix if repo.empty?
     repo = 'scm' if repo.empty?
     prefix = "[#{repo}][#{short_ref_name(ref_name)}]"
 
@@ -21,7 +28,7 @@ class CommitHook
     unless recipient.empty?
       diff2html.result.reverse.each_with_index do |result, i|
         nr = diff2html.result.size > 1 ? "[#{sprintf('%03d', i)}]": ''
-        emailer = Emailer.new config, recipient, result[:author_email], result[:author_name],
+        emailer = Emailer.new config, project_path, recipient, result[:author_email], result[:author_name],
                        "#{prefix}#{nr} #{result[:message]}", result[:text_content], result[:html_content], rev1, rev2, ref_name
         emailer.send
       end
