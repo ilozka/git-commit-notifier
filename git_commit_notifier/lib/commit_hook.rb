@@ -15,7 +15,7 @@ class CommitHook
 
     repo = config['email']['application_name'].value.empty? ? Git.prefix : config['email']['application_name'].value
     repo = 'scm' if repo.empty?
-    prefix = "[#{repo}][#{ref_name}]"
+    prefix = "[#{repo}][#{short_ref_name(ref_name)}]"
 
     diff2html = DiffToHtml.new
     diff2html.diff_between_revisions rev1, rev2, repo, ref_name
@@ -26,6 +26,13 @@ class CommitHook
         emailer.send
       end
     end
+  end
+
+  def self.short_ref_name(ref_name)
+    ref_name.match(/\/refs\/(.*)\/(.*)/)
+    ref_type = $1
+    ref = $2
+    ref_type =~ /^head/ ? ref : ref_name
   end
 
 end
