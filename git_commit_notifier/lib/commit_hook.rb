@@ -8,17 +8,17 @@ require File.dirname(__FILE__) + '/git'
 
 class CommitHook
 
-  def self.run(rev1, rev2, ref_name)
+  def self.run(rev1, rev2, ref_name, config_file = nil)
 
-    config = YAML.load_file('/usr/local/share/git_commit_notifier/config/config.yml')
+    config = YAML.load_file(config_file || '/usr/local/share/git_commit_notifier/config/config.yml')
     project_path = Dir.getwd
 
-    project_config = config['projects'][project_path]
+    project_config = config['projects'] ? config['projects'][project_path] : {}
 
-    recipient = project_config['recipient_address']
+    recipient = project_config['recipient_address'].to_s
     recipient = Git.mailing_list_address if recipient.empty?
 
-    repo = project_config['application_name']
+    repo = project_config['application_name'].to_s
     repo = Git.prefix if repo.empty?
     repo = 'scm' if repo.empty?
     prefix = "[#{repo}][#{short_ref_name(ref_name)}]"
