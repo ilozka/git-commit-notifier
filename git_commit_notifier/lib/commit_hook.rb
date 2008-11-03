@@ -20,9 +20,10 @@ class CommitHook
     diff2html = DiffToHtml.new
     diff2html.diff_between_revisions rev1, rev2, repo, ref_name
     unless recipient.empty?
-      diff2html.result.each do |result|
+      diff2html.result.reverse.each_with_index do |result, i|
+        nr = diff2html.result.size > 1 ? "[#{sprintf('%03d', i)}]": ''
         emailer = Emailer.new recipient, result[:author_email], result[:author_name],
-                       "#{prefix} #{result[:message]}", result[:text_content], result[:html_content], rev1, rev2, ref_name
+                       "#{prefix}#{nr} #{result[:message]}", result[:text_content], result[:html_content], rev1, rev2, ref_name
         emailer.send
       end
     end

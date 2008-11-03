@@ -12,7 +12,10 @@ For example:
  [rails][master] Fix Brasilia timezone. [#1180 state:resolved]
 
 A reply-to header is added containing the author of the commit. This
-makes follow up really simple.
+makes follow up really simple. If multiple commits are pushed at once,
+emails are numbered in chronological order:
+ [rails][master][000] Added deprecated warning messages to Float#months and Float#years deprications.
+ [rails][master][001] Enhance testing for fractional days and weeks. Update changelog.
 
 == Requirements
 
