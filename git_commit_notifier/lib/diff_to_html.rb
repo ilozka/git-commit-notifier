@@ -251,12 +251,12 @@ class DiffToHtml
 
       commit, author, email, date, message = extract_commit_info_from_git_show_output(raw_diff)
 
-      title = "<div class=\"title\"><strong>Repository:</strong> #{repo}\n<br />"
-      title += "<strong>Branch:</strong> #{branch}\n<br />"
-      title += "<strong>Commit</strong> #{commit}\n<br />"
-      title += "<strong>Author:</strong> #{CGI.escapeHTML(author)} &lt;#{email}&gt;\n<br />"
+      title = "<div class=\"title\">"
+      title += "<strong>Message:</strong> #{message_array_as_html message}<br />\n"
+      title += "<strong>Commit</strong> #{commit}<br />\n"
+      title += "<strong>Branch:</strong> #{branch}\n<br />" unless branch =~ /\/head/
       title += "<strong>Date:</strong> #{CGI.escapeHTML date}\n<br />"
-      title += "<strong>Message:</strong> #{message_array_as_html message}</div>"
+      title += "<strong>Author:</strong> #{CGI.escapeHTML(author)} &lt;#{email}&gt;\n</div>"
 
       text = "#{raw_diff}\n\n\n"
 
