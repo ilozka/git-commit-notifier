@@ -27,12 +27,18 @@ class CommitHook
     diff2html.diff_between_revisions rev1, rev2, repo, ref_name
     unless recipient.empty?
       diff2html.result.reverse.each_with_index do |result, i|
-        nr = diff2html.result.size > 1 ? "[#{sprintf('%03d', i)}]": ''
+        nr = number(diff2html.result.size, i)
         emailer = Emailer.new config, project_path, recipient, result[:author_email], result[:author_name],
                        "#{prefix}#{nr} #{result[:message]}", result[:text_content], result[:html_content], rev1, rev2, ref_name
         emailer.send
       end
     end
+  end
+
+  def self.number(total_entries, i)
+    return '' if total_entries <= 1
+    digits = total_entries < 10 ? 1 : 3
+    '[' + sprintf("%0#{digits}d", i) + ']'
   end
 
   def self.short_ref_name(ref_name)
