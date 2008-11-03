@@ -157,14 +157,14 @@ class DiffToHtml
         @current_file_name = file_name
       end
 
-      @left_ln.nil? ? process_info_line(line) : process_code_line(line)
+      op = line[0,1]
+      @left_ln.nil? || op == '@' ? process_info_line(line, op) : process_code_line(line, op)
     end
     add_changes_to_result
     @diff_result
   end
 
-  def process_code_line(line)
-    op = line[0,1]
+  def process_code_line(line, op)
     if op == '-'
       @diff_lines << { :removed => @left_ln, :added => nil, :op => :removal, :content => line[1..-1] }
       @left_ln += 1
@@ -178,8 +178,7 @@ class DiffToHtml
     end
   end
 
-  def process_info_line(line)
-    op = line[0,1]
+  def process_info_line(line, op)
     if line =~/^deleted\sfile\s/
       @file_removed = true
     elsif line =~ /^\-\-\-\s/ && line =~ /\/dev\/null/

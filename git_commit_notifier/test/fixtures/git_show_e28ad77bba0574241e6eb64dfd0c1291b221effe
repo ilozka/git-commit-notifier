@@ -3,7 +3,7 @@ Author: Tom Stuart <tom@experthuman.com>
 Date:   Wed Oct 8 09:31:00 2008 +0100
 
     Allow use of :path_prefix and :name_prefix outside of namespaced routes. [#1188 state:resolved]
-    
+
     Signed-off-by: Pratik Naik <pratiknaik@gmail.com>
 
 diff --git a/actionpack/lib/action_controller/routing/builder.rb b/actionpack/lib/action_controller/routing/builder.rb
@@ -16,22 +16,33 @@ index 5704d9d..7b888fa 100644
        def divide_route_options(segments, options)
 -        options = options.dup
 +        options = options.except(:path_prefix, :name_prefix)
- 
+
          if options[:namespace]
            options[:controller] = "#{options.delete(:namespace).sub(/\/$/, '')}/#{options[:controller]}"
 -          options.delete(:path_prefix)
 -          options.delete(:name_prefix)
          end
- 
+
          requirements = (options.delete(:requirements) || {}).dup
+@@ -68,7 +73,9 @@ class Client < ActiveRecord::Base
+   end
+
+   def removable?
+-    self.projects.find(:first, :select => 'id').nil? && self.invoices.find(:first, :select => 'id').nil?
++    self.projects.find(:first, :select => 'id').nil? &&
++      self.invoices.find(:first, :select => 'id').nil? &&
++      self.recurring_invoices.find(:first, :select => 'id').nil?
+   end
+
+   # some comment
 diff --git a/actionpack/test/controller/routing_test.rb b/actionpack/test/controller/routing_test.rb
 index 1eb26a7..9699a04 100644
 --- a/actionpack/test/controller/routing_test.rb
 +++ b/actionpack/test/controller/routing_test.rb
 @@ -924,6 +924,20 @@ uses_mocha 'LegacyRouteSet, Route, RouteSet and RouteLoading' do
- 
+
      end
- 
+
 +    def test_named_route_with_name_prefix
 +      rs.add_named_route :page, 'page', :controller => 'content', :action => 'show_page', :name_prefix => 'my_'
 +      x = setup_for_named_route
@@ -52,7 +63,7 @@ index 1eb26a7..9699a04 100644
 @@ -2147,6 +2161,13 @@ uses_mocha 'LegacyRouteSet, Route, RouteSet and RouteLoading' do
        assert_equal [:x], set.extra_keys(args)
      end
- 
+
 +    def test_generate_with_path_prefix
 +      set.draw { |map| map.connect ':controller/:action/:id', :path_prefix => 'my' }
 +

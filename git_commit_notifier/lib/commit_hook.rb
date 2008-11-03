@@ -13,12 +13,12 @@ class CommitHook
     config = YAML.load_file(config_file || '/usr/local/share/git_commit_notifier/config/config.yml')
     project_path = Dir.getwd
 
-    project_config = config['projects'] ? config['projects'][project_path] : {}
+    project_config = config['projects'] && config['projects'][project_path] ? config['projects'][project_path] : nil
 
-    recipient = project_config['recipient_address'].to_s
+    recipient = project_config ? project_config['recipient_address'] : ''
     recipient = Git.mailing_list_address if recipient.empty?
 
-    repo = project_config['application_name'].to_s
+    repo = project_config ? project_config['application_name'] : ''
     repo = Git.prefix if repo.empty?
     repo = 'scm' if repo.empty?
     prefix = "[#{repo}][#{short_ref_name(ref_name)}]"

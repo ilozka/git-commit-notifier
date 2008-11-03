@@ -21,6 +21,10 @@ class DiffToHtmlTest < Test::Unit::TestCase
     diff.diff_between_revisions REVISIONS.first, REVISIONS.last, 'testproject', 'master'
     assert_equal 4, diff.result.size # one result for each of the commits
 
+    diff.result.each do |html|
+      assert !html.include?('@@') # diff correctly processed
+    end
+
     # first commit
     hp = Hpricot diff.result.first[:html_content]
     assert_equal 2, (hp/"table").size # 8 files updated - one table for each of the files
@@ -66,6 +70,7 @@ class DiffToHtmlTest < Test::Unit::TestCase
     assert_equal 1, diff.result.size # single result for a single commit
 
     hp = Hpricot(diff.result.first[:html_content])
+    assert !diff.result.first[:html_content].include?('@@')
     assert_equal 2, (hp/"table").size # 2 files updated
     (hp/"table/tr/").each do |td|
       if td.inner_html == "require&nbsp;'iconv'"
