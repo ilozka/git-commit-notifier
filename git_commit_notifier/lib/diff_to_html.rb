@@ -235,6 +235,12 @@ class DiffToHtml
     [$1, $2]
   end
 
+  def first_sentence(message_array)
+    msg = message_array.join("\n").split(/(\.\s)|\n/).first.to_s.strip
+    return message_array.first if msg.empty?
+    msg
+  end
+
   def diff_between_revisions(rev1, rev2, repo, branch)
     @result = []
     if rev1 == rev2
@@ -263,7 +269,7 @@ class DiffToHtml
       html += diff_for_revision(extract_diff_from_git_show_output(raw_diff))
       html += "<br /><br />"
       @result << {:author_name => author, :author_email => email,
-                  :message => message.first[0..120], :html_content => html, :text_content => text }
+                  :message => first_sentence(message), :html_content => html, :text_content => text }
     end
   end
 end
