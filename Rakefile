@@ -33,9 +33,7 @@ task :install do |install|
 
   install_path = '/usr/local/share'
 
-  execute_cmd "cp -r git_commit_notifier/ #{install_path}"
-  execute_cmd "cp README.rdoc #{install_path}/git_commit_notifier"
-  execute_cmd "cp LICENSE #{install_path}/git_commit_notifier"
+  install_script_files(install_path)
   execute_cmd "mv #{hooks_dir}post-receive #{hooks_dir}post-receive.old.#{Time.now.to_i}" if File.exist?("#{hooks_dir}post-receive")
   execute_cmd "cp post-receive #{hooks_dir}"
   execute_cmd "chmod a+x #{hooks_dir}post-receive"
@@ -52,7 +50,18 @@ task :install do |install|
   puts "Warning: no Git email prefix setting exists for your project. Please go to your project directory and set it with the git config hooks.emailprefix=your_project_name or specify 'application_name' in the #{config_file} file\n\n" if `git config hooks.emailprefix`.empty?
 
   puts "Emails are sent by default via local sendmail. To change this, update #{config_file}"
-  puts "Installation successful. Update config.yml to setup notification for more projects.\n\n"
+  puts "Installation successful. Update config.yml to setup notification for more projects."
+end
+
+task :update do |update|
+  install_script_files('/usr/local/share')
+  puts "Update successful."
+end
+
+def install_script_files(install_path)
+  execute_cmd "cp -r git_commit_notifier/ #{install_path}"
+  execute_cmd "cp README.rdoc #{install_path}/git_commit_notifier"
+  execute_cmd "cp LICENSE #{install_path}/git_commit_notifier"
 end
 
 def execute_cmd(cmd)

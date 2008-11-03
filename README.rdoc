@@ -35,6 +35,9 @@ Make sure the following Git settings are correct:
 Run the automated installation script:
   sudo rake install
 
+To update already installed script, use:
+  sudo rake update
+
 See /usr/local/share/git_commit_notifier/config/config.yml for setting your SMTP server address and some other mail options.
 
 == License
