@@ -8,8 +8,7 @@ require File.dirname(__FILE__) + '/git'
 
 class CommitHook
 
-  def self.run(rev1, rev2, ref_name)
-    config = YAML.parse_file(File.dirname(__FILE__) + '/../config/config.yml')
+  def self.run(config, rev1, rev2, ref_name)
 
     recipient = config['email']['recipient_address'].value.empty? ? Git.mailing_list_address : config['email']['recipient_address'].value
 
@@ -22,7 +21,7 @@ class CommitHook
     unless recipient.empty?
       diff2html.result.reverse.each_with_index do |result, i|
         nr = diff2html.result.size > 1 ? "[#{sprintf('%03d', i)}]": ''
-        emailer = Emailer.new recipient, result[:author_email], result[:author_name],
+        emailer = Emailer.new config, recipient, result[:author_email], result[:author_name],
                        "#{prefix}#{nr} #{result[:message]}", result[:text_content], result[:html_content], rev1, rev2, ref_name
         emailer.send
       end
@@ -30,7 +29,7 @@ class CommitHook
   end
 
   def self.short_ref_name(ref_name)
-    ref_name.match(/\/refs\/(.*)\/(.*)/)
+    ref_name.strip.match(/refs\/(.*)\/(.*)/)[0]
     ref_type = $1
     ref = $2
     ref_type =~ /^head/ ? ref : ref_name

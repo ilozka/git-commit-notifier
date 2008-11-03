@@ -38,12 +38,12 @@ Run the automated installation script:
 or perform manual install:
 
 - copy the git_commit_notifier directory into your /usr/local/share directory
-- copy the post-receive script into the /.git/hooks directory of the project on your Git server
-- set your preferred delivery method in config.yml, set SMTP server options if you choose this delivery method
+- copy the post-receive script and commit_notifier_config.yml into the /hooks directory of your repository on the Git server
+- set your preferred delivery method in commit_notifier_config.yml, set SMTP server options if you choose this delivery method
 - make sure your 'post_receive' script is executable
 
 
-See /usr/local/share/git_commit_notifier/config/config.yml for setting your SMTP server address.
+See your_repository/hooks/commit_notifier_config.yml for setting your SMTP server address.
 
 == License
 MIT License, see the file LICENSE.

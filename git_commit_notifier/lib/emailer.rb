@@ -2,7 +2,8 @@ require 'yaml'
 
 class Emailer
 
-  def initialize(recipient, from_address, from_alias, subject, text_message, html_message, old_rev, new_rev, ref_name)
+  def initialize(config, recipient, from_address, from_alias, subject, text_message, html_message, old_rev, new_rev, ref_name)
+    @config = config
     @recipient = recipient
     @from_address = from_address
     @from_alias = from_alias
@@ -70,7 +71,6 @@ EOF
   end
 
   def send
-    config = YAML.parse_file(File.dirname(__FILE__) + '/../config/config.yml')
     from = @from_alias.empty? ? @from_address : "#{@from_alias} <#{@from_address}>"
     content = ["From: #{from}",
         "Reply-To: #{from}",
@@ -92,10 +92,10 @@ EOF
         "Content-Disposition: inline\n\n\n",
         @html_message,
         "--#{boundary}--"]
-    if config['email']['delivery_method'].value == 'smtp'
-      perform_delivery_smtp(content, config['smtp_server'])
+    if @config['email']['delivery_method'].value == 'smtp'
+      perform_delivery_smtp(content, @config['smtp_server'])
     else
-      perform_delivery_sendmail(content, config['sendmail_options'])
+      perform_delivery_sendmail(content, @config['sendmail_options'])
     end
   end
 end
