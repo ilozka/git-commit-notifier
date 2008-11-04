@@ -6,6 +6,7 @@ require 'yaml'
 
 task :default => [:test]
 
+desc "Run tests"
 task :test do |test|
   Rake::TestTask.new do |t|
     t.libs << "test"
@@ -14,6 +15,7 @@ task :test do |test|
   end
 end
 
+desc "Install Git Commit Notifier for the first time"
 task :install do |install|
   puts "Full path to yor project repository (eg. /home/git/repositories/myproject.git):"
   project_path = STDIN.gets.strip
@@ -53,6 +55,7 @@ task :install do |install|
   puts "Installation successful. Update config.yml to setup notification for more projects."
 end
 
+desc "Update already installed Git Commit Notifier"
 task :update do |update|
   install_script_files('/usr/local/share')
   puts "Update successful."
