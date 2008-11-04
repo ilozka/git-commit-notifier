@@ -42,10 +42,7 @@ class CommitHook
   end
 
   def self.short_ref_name(ref_name)
-    ref_name.strip.match(/refs\/(.*)\/(.*)/)[0]
-    ref_type = $1
-    ref = $2
-    ref_type =~ /^head/ ? ref : ref_name
+    ref_name.strip.split('/').last
   end
 
 end
