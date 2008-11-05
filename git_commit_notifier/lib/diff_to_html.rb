@@ -223,8 +223,7 @@ class DiffToHtml
         result[:message] << clean_line unless clean_line.empty?
       end
     end
-    # should never reach here because diff show should contain at least one line beginning with diff --...
-    raise "Unexpected DIFF content, please contact the author: #{content}"
+    result
   end
 
   def message_array_as_html(message)
@@ -241,7 +240,7 @@ class DiffToHtml
 
   def first_sentence(message_array)
     msg = message_array.join("\n").split(/(\.\s)|\n/).first.to_s.strip
-    return message_array.first if msg.empty?
+    return message_array.first if msg.empty? || msg =~ /^Merge\:/
     msg
   end
 
