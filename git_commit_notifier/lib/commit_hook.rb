@@ -28,8 +28,8 @@ class CommitHook
     unless recipient.empty?
       diff2html.result.reverse.each_with_index do |result, i|
         nr = number(diff2html.result.size, i)
-        emailer = Emailer.new config, project_path, recipient, result[:author_email], result[:author_name],
-                       "#{prefix}#{nr} #{result[:message]}", result[:text_content], result[:html_content], rev1, rev2, ref_name
+        emailer = Emailer.new config, project_path, recipient, result[:commit_info][:email], result[:commit_info][:author],
+                       "#{prefix}#{nr} #{result[:commit_info][:message]}", result[:text_content], result[:html_content], rev1, rev2, ref_name
         emailer.send
       end
     end

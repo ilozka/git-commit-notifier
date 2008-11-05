@@ -68,7 +68,9 @@ class DiffToHtmlTest < Test::Unit::TestCase
     diff = DiffToHtml.new
     diff.diff_between_revisions REVISIONS.first, REVISIONS.first, 'testproject', 'master'
     assert_equal 1, diff.result.size # single result for a single commit
-    assert_equal 'Allow use of :path_prefix and :name_prefix outside of namespaced routes', diff.result.first[:message]
+    assert_equal 'Allow use of :path_prefix and :name_prefix outside of namespaced routes', diff.result.first[:commit_info][:message]
+    assert_equal 'Tom Stuart', diff.result.first[:commit_info][:author]
+    assert_equal 'tom@experthuman.com', diff.result.first[:commit_info][:email]
 
     hp = Hpricot(diff.result.first[:html_content])
     assert !diff.result.first[:html_content].include?('@@')

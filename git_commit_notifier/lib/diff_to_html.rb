@@ -208,22 +208,23 @@ class DiffToHtml
   end
 
   def extract_commit_info_from_git_show_output(content)
-    message = []
-    commit = author = date = email = ''
+    result = { :message => [], :commit => '', :author => '', :date => '', :email => '' }
     content.split("\n").each do |line|
-      if line =~ /^diff/
-        return [commit, author, email, date, message]
+      if line =~ /^diff/ # end of commit info, return results
+        return result
       elsif line =~ /^commit/
-        commit = line[7..-1]
+        result[:commit] = line[7..-1]
       elsif line =~ /^Author/
-        author, email = author_name_and_email(line[8..-1])
+        result[:author], result[:email] = author_name_and_email(line[8..-1])
       elsif line =~ /^Date/
-        date = line[8..-1]
+        result[:date] = line[8..-1]
       else
         clean_line = line.strip
-        message << clean_line unless clean_line.empty?
+        result[:message] << clean_line unless clean_line.empty?
       end
     end
+    # should never reach here because diff show should contain at least one line beginning with diff --...
+    raise "Unexpected DIFF content, please contact the author: #{content}"
   end
 
   def message_array_as_html(message)
@@ -231,8 +232,11 @@ class DiffToHtml
   end
 
   def author_name_and_email(info)
-    info.match /(.*)<(.*)>/
-    [$1, $2]
+    # input string format: "autor name <author@email.net>"
+    result = info.scan(/(.*)\s<(.*)>/)[0]
+    return result if result.is_a?(Array) && result.size == 2 # normal operation
+    # incomplete author info - return it as author name
+    return [info, ''] if result.nil?
   end
 
   def first_sentence(message_array)
@@ -247,29 +251,30 @@ class DiffToHtml
       commits = [[rev1]]
     else
       log = Git.log(rev1, rev2)
-      commits = (log.scan /commit\s([a-f0-9]+)/)
+      commits = log.scan /commit\s([a-f0-9]+)/
     end
 
     commits.each_with_index do |commit, i|
       raw_diff = Git.show(commit[0])
+      raise "git show output is empty" if raw_diff.empty?
       @last_raw = raw_diff
 
-      commit, author, email, date, message = extract_commit_info_from_git_show_output(raw_diff)
+      commit_info = extract_commit_info_from_git_show_output(raw_diff)
 
       title = "<div class=\"title\">"
-      title += "<strong>Message:</strong> #{message_array_as_html message}<br />\n"
-      title += "<strong>Commit</strong> #{commit}<br />\n"
+      title += "<strong>Message:</strong> #{message_array_as_html commit_info[:message]}<br />\n"
+      title += "<strong>Commit</strong> #{commit_info[:commit]}<br />\n"
       title += "<strong>Branch:</strong> #{branch}\n<br />" unless branch =~ /\/head/
-      title += "<strong>Date:</strong> #{CGI.escapeHTML date}\n<br />"
-      title += "<strong>Author:</strong> #{CGI.escapeHTML(author)} &lt;#{email}&gt;\n</div>"
+      title += "<strong>Date:</strong> #{CGI.escapeHTML commit_info[:date]}\n<br />"
+      title += "<strong>Author:</strong> #{CGI.escapeHTML(commit_info[:author])} &lt;#{commit_info[:email]}&gt;\n</div>"
 
       text = "#{raw_diff}\n\n\n"
 
       html = title
       html += diff_for_revision(extract_diff_from_git_show_output(raw_diff))
       html += "<br /><br />"
-      @result << {:author_name => author, :author_email => email,
-                  :message => first_sentence(message), :html_content => html, :text_content => text }
+      commit_info[:message] = first_sentence(commit_info[:message])
+      @result << {:commit_info => commit_info, :html_content => html, :text_content => text }
     end
   end
 end
