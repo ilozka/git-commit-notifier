@@ -1,6 +1,6 @@
 h1. Git Commit Notifier
 
-h2. by Csoma Zoltan (Primalgrasp) (zoltan 'at' primalgrasp 'dot' com)
+<pre>by Csoma Zoltan (Primalgrasp) (zoltan 'at' primalgrasp 'dot' com)</pre>
 
 Sends email commit messages splitting commits that were pushed in one
 step. Email is delivered as text or HTML with changes refined per
