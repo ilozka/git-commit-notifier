@@ -120,7 +120,7 @@ class DiffToHtml
           additions << line if line[:op] == :addition
         end
         if line[:op] == :unchanged || line == @diff_lines.last # unchanged line or end of block, add prev lines to result
-          if removals.size > 0 && additions.size > 0 # block of removed and added lines - perform intelligent diff
+          if removals.size > 0 && additions.size > 0  # block of removed and added lines - perform intelligent diff
             add_block_to_results(lcs_diff(removals, additions), escape = false)
           else # some lines removed or added - no need to perform intelligent diff
             add_block_to_results(removals + additions, escape = true)
@@ -148,11 +148,10 @@ class DiffToHtml
     @diff_lines = []
     @removed_files = []
     @current_file_name = nil
-
     content.split("\n").each do |line|
-      if line =~ /^diff\s\-\-git/
-        line.match(/diff --git a\/(.*)\sb\//)
-        file_name = $1
+      res = line.scan(/diff --git a\/(.*)\sb\//)[0]
+      unless res.nil?
+        file_name = res[0]
         add_changes_to_result
         @current_file_name = file_name
       end
@@ -247,14 +246,13 @@ class DiffToHtml
   def diff_between_revisions(rev1, rev2, repo, branch)
     @result = []
     if rev1 == rev2
-      commits = [[rev1]]
+      commits = [rev1]
     else
-      log = Git.log(rev1, rev2)
-      commits = log.scan /commit\s([a-f0-9]+)/
+      commits = Git.rev_list(rev1, rev2).split("\n")
     end
 
-    commits.each_with_index do |commit, i|
-      raw_diff = Git.show(commit[0])
+    commits.each do |commit|
+      raw_diff = Git.show(commit)
       raise "git show output is empty" if raw_diff.empty?
       @last_raw = raw_diff
 
@@ -274,6 +272,7 @@ class DiffToHtml
       html += "<br /><br />"
       commit_info[:message] = first_sentence(commit_info[:message])
       @result << {:commit_info => commit_info, :html_content => html, :text_content => text }
+
     end
   end
 end
