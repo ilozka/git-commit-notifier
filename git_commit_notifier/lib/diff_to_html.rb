@@ -38,7 +38,7 @@ class DiffToHtml
     klass = line_class(line)
     content = escape ? escape_content(line[:content]) : line[:content]
     padding = '&nbsp;' if klass != ''
-    @diff_result += "<tr#{klass}>\n<td class=\"ln\">#{line[:removed]}</td>\n<td class=\"ln\">#{line[:added]}</td>\n<td>#{padding}#{content}</td></tr>\n"
+    @diff_result << "<tr#{klass}>\n<td class=\"ln\">#{line[:removed]}</td>\n<td class=\"ln\">#{line[:added]}</td>\n<td>#{padding}#{content}</td></tr>"
   end
 
   def extract_block_content(block)
@@ -109,8 +109,8 @@ class DiffToHtml
 
   def add_changes_to_result
     return if @current_file_name.nil?
-    @diff_result += operation_description
-    @diff_result += '<table>'
+    @diff_result << operation_description
+    @diff_result << '<table>'
     unless @diff_lines.empty?
       removals = []
       additions = []
@@ -131,7 +131,7 @@ class DiffToHtml
         end
       end
       @diff_lines = []
-      @diff_result +='</table>'
+      @diff_result << '</table>'
     end
     # reset values
     @right_ln = nil
@@ -144,7 +144,7 @@ class DiffToHtml
   def diff_for_revision(content)
     @left_ln = @right_ln = nil
 
-    @diff_result = ""
+    @diff_result = []
     @diff_lines = []
     @removed_files = []
     @current_file_name = nil
@@ -161,7 +161,7 @@ class DiffToHtml
       @left_ln.nil? || op == '@' ? process_info_line(line, op) : process_code_line(line, op)
     end
     add_changes_to_result
-    @diff_result
+    @diff_result.join("\n")
   end
 
   def process_code_line(line, op)

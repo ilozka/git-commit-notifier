@@ -1,6 +1,6 @@
 class Git
   def self.show(rev)
-    `git show #{rev} -w`
+    `git show #{rev.strip} -w`
   end
 
   def self.log(rev1, rev2)
