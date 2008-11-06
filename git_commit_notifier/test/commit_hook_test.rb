@@ -9,7 +9,7 @@ class CommitHookTest < Test::Unit::TestCase
 
   def test_hook
     path = File.dirname(__FILE__) + '/fixtures/'
-    Git.expects(:log).with(REVISIONS.first, REVISIONS.last).returns(read_file(path + 'git_log'))
+    Git.expects(:rev_list).with(REVISIONS.first, REVISIONS.last).returns(read_file(path + 'git_rev_list'))
     Git.expects(:mailing_list_address).returns('recipient@test.com')
     REVISIONS.each do |rev|
       Git.expects(:show).with(rev).returns(read_file(path + "git_show_#{rev}"))

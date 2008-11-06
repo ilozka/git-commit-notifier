@@ -12,7 +12,7 @@ class DiffToHtmlTest < Test::Unit::TestCase
 
   def test_multiple_commits
     path = File.dirname(__FILE__) + '/fixtures/'
-    Git.expects(:log).with(REVISIONS.first, REVISIONS.last).returns(read_file(path + 'git_log'))
+    Git.expects(:rev_list).with(REVISIONS.first, REVISIONS.last).returns(read_file(path + 'git_rev_list'))
     REVISIONS.each do |rev|
       Git.expects(:show).with(rev).returns(read_file(path + 'git_show_' + rev))
     end
