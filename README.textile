@@ -30,10 +30,11 @@ h1. Requirements
 
 h1. Installing and Configuring
 
-Make sure the following Git settings are correct:
-- git config hooks.mailinglist (email address of the recipient, probably your mailing list address)
-- git config hooks.emailprefix (application name, used in email subject)
-- see /usr/local/share/git_commit_notifier/config/config.yml for overriding these settings
+Before installing the Git Commit Notification script, make sure the following Git settings are correct:
+* git config hooks.mailinglist (email address of the recipient, probably your mailing list address)
+* git config hooks.emailprefix (application name, used in email subject)
+
+See /usr/local/share/git_commit_notifier/config/config.yml for overriding these settings
 
 Run the automated installation script:
   <pre>sudo rake install</pre>
