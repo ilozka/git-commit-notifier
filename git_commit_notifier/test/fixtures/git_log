@@ -1,0 +1,34 @@
+commit e28ad77bba0574241e6eb64dfd0c1291b221effe
+Author: Tom Stuart <tom@experthuman.com>
+Date:   Wed Oct 8 09:31:00 2008 +0100
+
+    Allow use of :path_prefix and :name_prefix outside of namespaced routes. [#1188 state:resolved]
+    
+    Signed-off-by: Pratik Naik <pratiknaik@gmail.com>
+
+commit a4629e707d80a5769f7a71ca6ed9471015e14dc9
+Author: Michael Koziarski <michael@koziarski.com>
+Date:   Mon Sep 29 17:36:09 2008 +0200
+
+    Extract transliteration code to a seperate method.
+    
+    Use iconv by default, but only when the transliteration is well behaved.  When it isn't, fallback to mb_chars
+
+commit dce6ade4cdc2833b53bd600ef10f9bce83c7102d
+Author: Andrew Kaspick <andrew@redlinesoftware.com>
+Date:   Tue Sep 30 14:15:36 2008 -0500
+
+    Ensure select_tag#name attribute uses [] when :multiple is true. [#1146 state:resolved]
+    
+    Signed-off-by: Pratik Naik <pratiknaik@gmail.com>
+
+commit 51b986619d88f7ba98be7d271188785cbbb541a0
+Author: Tarmo Tänav <tarmo@itech.ee>
+Date:   Mon Oct 6 17:35:21 2008 +0300
+
+    Implement submit_to_remote as a wrapper around a more generic button_to_remote
+    
+    Removed the "return false" from submit_to_remote onclick end as
+    button input elements have no default behavior to cancel.
+    
+    Signed-off-by: Pratik Naik <pratiknaik@gmail.com>
