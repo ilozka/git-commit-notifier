@@ -17,7 +17,6 @@ class CommitHookTest < Test::Unit::TestCase
     emailer = mock('Emailer')
     Emailer.expects(:new).times(4).returns(emailer) # 4 commit, one email for each of them
     emailer.expects(:send).times(4)
-    config_file = File.dirname(__FILE__) + '/../config/config.yml'
-    CommitHook.run REVISIONS.first, REVISIONS.last, 'refs/heads/master', config_file
+    CommitHook.run REVISIONS.first, REVISIONS.last, 'refs/heads/master'
   end
 end

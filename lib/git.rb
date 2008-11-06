@@ -10,6 +10,10 @@ class Git
   def self.prefix
     `git config hooks.emailprefix`.strip
   end
+  
+  def self.reponame
+    `pwd`.chomp.split("/").last
+  end
 
   def self.mailing_list_address
     `git config hooks.mailinglist`.strip

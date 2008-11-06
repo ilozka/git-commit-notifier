@@ -1,19 +1,22 @@
 require 'yaml'
+require 'erb'
 
 class Emailer
 
-  def initialize(config, project_path, recipient, from_address, from_alias, subject, text_message, html_message, old_rev, new_rev, ref_name)
-    @config = config
+  def initialize(project_path, recipient, from_address, from_alias, subject, text_message, html_diff, old_rev, new_rev, ref_name)
+    @config = YAML::load_file('../config/email.yml') if File.exist?('../config/email.yml')
     @project_path = project_path
     @recipient = recipient
     @from_address = from_address
     @from_alias = from_alias
     @subject = subject
     @text_message = text_message
-    @html_message = format_html(html_message)
     @ref_name = ref_name
     @old_rev = old_rev
     @new_rev = new_rev
+    
+    template = File.join(File.dirname(__FILE__), '/../template/email.html.erb')
+    @html_message = ERB.new(File.read(template)).result(binding)
   end
 
   def boundary
@@ -23,28 +26,12 @@ class Emailer
     @boundary = Digest::SHA1.hexdigest(seed)
   end
 
-  def format_html(html_diff)
-<<EOF
-<html><head>
-<style>#{read_css}
-</style>
-</head>
-<body>
-#{html_diff}
-</body>
-</html>
-EOF
+  def stylesheet_string
+    stylesheet = File.join(File.dirname(__FILE__), '/../template/styles.css')
+    File.read(stylesheet)
   end
 
-  def read_css
-    out = ''
-    File.open(File.dirname(__FILE__) + '/../stylesheets/styles.css').each { |line|
-      out += line
-    }
-    out
-  end
-
-  def perform_delivery_smtp(content,smtp_settings)
+  def perform_delivery_smtp(content, smtp_settings)
     settings = { }
     %w(address port domain user_name password authentication).each do |key|
       val = smtp_settings[key].to_s.empty? ? nil : smtp_settings[key]
@@ -60,13 +47,14 @@ EOF
     end
   end
 
-  def perform_delivery_sendmail(content, sendmail_settings)
-    args = '-i -t '
-    args += sendmail_settings['arguments'].to_s
-    IO.popen("#{sendmail_settings['location']} #{args}","w+") do |f|
-      content.each do |line|
-        f.puts line
-      end
+  def perform_delivery_sendmail(content, options = {})
+    sendmail_settings = {
+      'location' => "/usr/sbin/sendmail",
+      'arguments' => "-i -t"
+    }.merge(options)
+    command = "#{sendmail_settings['location']} #{sendmail_settings['arguments']}"
+    IO.popen(command, "w+") do |f|
+      f.write(content.join("\n"))
       f.flush
     end
   end
@@ -93,10 +81,12 @@ EOF
         "Content-Disposition: inline\n\n\n",
         @html_message,
         "--#{boundary}--"]
-    if @config['email']['delivery_method'] == 'smtp'
+    if @config && @config['email']['delivery_method'] == 'smtp'
       perform_delivery_smtp(content, @config['smtp_server'])
-    else
+    elsif @config && @config['sendmail_options']
       perform_delivery_sendmail(content, @config['sendmail_options'])
+    else
+      perform_delivery_sendmail(content)
     end
   end
 end

@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 # parameters: revision1, revision 2, branch
-require '/usr/local/share/git_commit_notifier/lib/commit_hook'
+THIS_FILE = File.symlink?(__FILE__) ? File.readlink(__FILE__) : __FILE__
+$:.unshift File.join(File.dirname(THIS_FILE), "../lib")
+require "commit_hook"
 
 if ARGV[0].nil?
   param = STDIN.gets.strip.split

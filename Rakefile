@@ -10,7 +10,7 @@ desc "Run tests"
 task :test do |test|
   Rake::TestTask.new do |t|
     t.libs << "test"
-    t.test_files = FileList['git_commit_notifier/test/*.rb']
+    t.test_files = FileList['test/*.rb']
     t.verbose = true
   end
 end
@@ -24,27 +24,12 @@ task :install do |install|
   raise 'hooks directory not found for the specified project - cannot continue' unless File.exist?(hooks_dir)
   hooks_dir += '/' unless hooks_dir[-1,-1] == '/'
 
-  # load default config file
-  config = YAML::load_file('git_commit_notifier/config/config.yml')
-
-  config.merge!({'projects' =>
-                     { project_path =>
-                          { 'application_name' => '', 'recipient_address' => ''}
-                     }
-                })
-
   install_path = '/usr/local/share'
 
   install_script_files(install_path)
   execute_cmd "mv #{hooks_dir}post-receive #{hooks_dir}post-receive.old.#{Time.now.to_i}" if File.exist?("#{hooks_dir}post-receive")
   execute_cmd "cp post-receive #{hooks_dir}"
   execute_cmd "chmod a+x #{hooks_dir}post-receive"
-
-  # write config file
-  config_file = "#{install_path}/git_commit_notifier/config/config.yml"
-  File.open(config_file, 'w') do |f|
-    YAML.dump(config, f)
-  end
 
   Dir.chdir(project_path)
 
