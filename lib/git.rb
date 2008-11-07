@@ -8,9 +8,10 @@ class Git
   end
 
   def self.prefix
-    [ `git config hooks.emailprefix`.strip,
-      `pwd`.chomp.split("/").last.gsub(/\.git$/, '')
-    ].find{|p| !p.empty? }
+    git_prefix = `git config hooks.emailprefix`.strip
+    return git_prefix unless git_prefix.empty?
+    dir_name = `pwd`.chomp.split("/").last.gsub(/\.git$/, '')
+    return "[#{dir_name}]"
   end
 
   def self.mailing_list_address
