@@ -14,8 +14,7 @@ class CommitHook
     project_path = Dir.getwd
 
     recipient = Git.mailing_list_address
-    repo = Git.reponame
-    subject_prefix = "[#{repo}]"
+    subject_prefix = "[#{Git.prefix}]"
 
     diff2html = DiffToHtml.new
     diff2html.diff_between_revisions rev1, rev2, repo, ref_name
