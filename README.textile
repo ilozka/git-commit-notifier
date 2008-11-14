@@ -46,7 +46,7 @@ See /usr/local/share/git_commit_notifier/config/config.yml for setting your SMTP
 
 h1. Credits
 
-Thanks for 'Primalgrasp':http://www.primalgrasp.com for sponsoring this work 
+Thanks for "Primalgrasp":http://www.primalgrasp.com for sponsoring this work 
 
 h1. License
 
