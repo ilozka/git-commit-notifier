@@ -1,6 +1,6 @@
 == Git Commit Notifier
 
- by Csoma Zoltan (Primalgrasp) (zoltan 'at' primalgrasp 'dot' com)
+ by Csoma Zoltan (info 'at' railsprogrammer 'dot' net)
 
 Sends email commit messages splitting commits that were pushed in one
 step. Email is delivered as text or HTML with changes refined per
@@ -39,6 +39,9 @@ To update already installed script, use:
   sudo rake update
 
 See /usr/local/share/git_commit_notifier/config/config.yml for setting your SMTP server address and some other mail options.
+
+== Credits
+Thanks for Primalgrasp (http://www.primalgrasp.com) for sponsoring this work 
 
 == License
 MIT License, see the file LICENSE.
