@@ -41,6 +41,7 @@ To update already installed script, use:
 See /usr/local/share/git_commit_notifier/config/config.yml for setting your SMTP server address and some other mail options.
 
 == Credits
+
 Thanks for Primalgrasp (http://www.primalgrasp.com) for sponsoring this work 
 
 == License
