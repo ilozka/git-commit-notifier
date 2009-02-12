@@ -239,7 +239,7 @@ class DiffToHtml
   end
 
   def first_sentence(message_array)
-    msg = message_array.join("\n").split(/(\.\s)|\n/).first.to_s.strip
+    msg = message_array.first.to_s.strip
     return message_array.first if msg.empty? || msg =~ /^Merge\:/
     msg
   end
