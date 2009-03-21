@@ -250,7 +250,7 @@ class DiffToHtml
       commits = [[rev1]]
     else
       log = Git.log(rev1, rev2)
-      commits = log.scan /commit\s([a-f0-9]+)/
+      commits = log.scan /^commit\s([a-f0-9]+)/
     end
 
     commits.each_with_index do |commit, i|
