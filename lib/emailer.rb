@@ -5,6 +5,7 @@ class Emailer
 
   def initialize(project_path, recipient, from_address, from_alias, subject, text_message, html_diff, old_rev, new_rev, ref_name)
     @config = YAML::load_file('../config/email.yml') if File.exist?('../config/email.yml')
+    @config ||= {}
     @project_path = project_path
     @recipient = recipient
     @from_address = from_address
@@ -14,7 +15,7 @@ class Emailer
     @ref_name = ref_name
     @old_rev = old_rev
     @new_rev = new_rev
-    
+
     template = File.join(File.dirname(__FILE__), '/../template/email.html.erb')
     @html_message = ERB.new(File.read(template)).result(binding)
   end
@@ -47,11 +48,11 @@ class Emailer
     end
   end
 
-  def perform_delivery_sendmail(content, options = {})
+  def perform_delivery_sendmail(content, options = nil)
     sendmail_settings = {
       'location' => "/usr/sbin/sendmail",
       'arguments' => "-i -t"
-    }.merge(options)
+    }.merge(options || {})
     command = "#{sendmail_settings['location']} #{sendmail_settings['arguments']}"
     IO.popen(command, "w+") do |f|
       f.write(content.join("\n"))
@@ -81,12 +82,17 @@ class Emailer
         "Content-Disposition: inline\n\n\n",
         @html_message,
         "--#{boundary}--"]
-    if @config && @config['email']['delivery_method'] == 'smtp'
+
+    if @recipient.empty?
+      puts content.join("\n")
+      return
+    end
+
+    if @config['delivery_method'] == 'smtp'
       perform_delivery_smtp(content, @config['smtp_server'])
-    elsif @config && @config['sendmail_options']
-      perform_delivery_sendmail(content, @config['sendmail_options'])
     else
-      perform_delivery_sendmail(content)
+      perform_delivery_sendmail(content, @config['sendmail_options'])
     end
   end
+
 end

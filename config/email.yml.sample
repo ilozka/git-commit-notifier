@@ -1,5 +1,4 @@
-email:
-  delivery_method: sendmail # smtp or sendmail
+delivery_method: sendmail # smtp or sendmail
 
 smtp_server:
   address: localhost
