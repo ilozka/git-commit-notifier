@@ -4,7 +4,8 @@ require 'erb'
 class Emailer
 
   def initialize(project_path, recipient, from_address, from_alias, subject, text_message, html_diff, old_rev, new_rev, ref_name)
-    @config = YAML::load_file('../config/email.yml') if File.exist?('../config/email.yml')
+    config_file = File.join(File.dirname(THIS_FILE), '../config/email.yml')
+    @config = YAML::load_file(config_file) if File.exist?(config_file)
     @config ||= {}
     @project_path = project_path
     @recipient = recipient

@@ -253,7 +253,7 @@ class DiffToHtml
       commits = log.scan /^commit\s([a-f0-9]+)/
     end
 
-    previous_file = '../config/previously.txt'
+    previous_file = THIS_FILE ? File.join(File.dirname(THIS_FILE), "../config/previously.txt") : "/tmp/previously.txt"
     previous_list = (File.read(previous_file).split("\n") if File.exist?(previous_file)) || []
     commits.reject!{|c| c.find{|sha| previous_list.include?(sha)} }
     File.open(previous_file, "a"){|f| f << commits.join("\n") << "\n" } unless commits.empty?
