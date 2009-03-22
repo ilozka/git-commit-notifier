@@ -256,7 +256,8 @@ class DiffToHtml
     previous_file = THIS_FILE ? File.join(File.dirname(THIS_FILE), "../config/previously.txt") : "/tmp/previously.txt"
     previous_list = (File.read(previous_file).split("\n") if File.exist?(previous_file)) || []
     commits.reject!{|c| c.find{|sha| previous_list.include?(sha)} }
-    File.open(previous_file, "a"){|f| f << commits.join("\n") << "\n" } unless commits.empty?
+    current_list = (previous_list + commits.flatten)[-1000..-1]
+    File.open(previous_file, "w"){|f| f << current_list.join("\n") } unless current_list.empty?
 
     commits.each_with_index do |commit, i|
       raw_diff = Git.show(commit[0])
