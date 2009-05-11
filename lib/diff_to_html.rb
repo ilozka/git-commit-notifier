@@ -247,20 +247,26 @@ class DiffToHtml
   def diff_between_revisions(rev1, rev2, repo, branch)
     @result = []
     if rev1 == rev2
-      commits = [[rev1]]
+      commits = [rev1]
+    elsif rev1 =~ /^0+$/
+      # creating a new remote branch
+      commits = Git.branch_commits(branch)
+    elsif rev2 =~ /^0+$/
+      # deleting an existing remote branch
+      commits = []
     else
       log = Git.log(rev1, rev2)
-      commits = log.scan /^commit\s([a-f0-9]+)/
+      commits = log.scan(/^commit\s([a-f0-9]+)/).map{|match| match[0]}
     end
 
-    previous_file = THIS_FILE ? File.join(File.dirname(THIS_FILE), "../config/previously.txt") : "/tmp/previously.txt"
+    previous_file = (defined?(THIS_FILE) && THIS_FILE) ? File.join(File.dirname(THIS_FILE), "../config/previously.txt") : "/tmp/previously.txt"
     previous_list = (File.read(previous_file).to_a.map {|sha| sha.chomp!} if File.exist?(previous_file)) || []
     commits.reject!{|c| c.find{|sha| previous_list.include?(sha)} }
     current_list = (previous_list + commits.flatten).last(1000)
     File.open(previous_file, "w"){|f| f << current_list.join("\n") } unless current_list.empty?
 
     commits.each_with_index do |commit, i|
-      raw_diff = Git.show(commit[0])
+      raw_diff = Git.show(commit)
       raise "git show output is empty" if raw_diff.empty?
       @last_raw = raw_diff
 
