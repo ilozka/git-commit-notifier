@@ -67,6 +67,7 @@ class Emailer
         "Reply-To: #{from}",
         "To: #{@recipient}",
         "Subject: #{@subject}",
+				"X-Mailer: git-commit-notifier",
         "X-Git-Refname: #{@ref_name}",
         "X-Git-Oldrev: #{@old_rev}",
         "X-Git-Newrev: #{@new_rev}",
